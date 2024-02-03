@@ -1,1 +1,1 @@
-import "./data-combine.js";
+import "./thumbnails.js";

@@ -14,9 +14,6 @@ function getRandomNumber(min, max) {
   return result;
 }
 
-// const unique25 = Array.from({ length: 25 }, (_, i) => i + 1);
-// const unique1000 = Array.from({ length: 1000 }, (_, i) => i + 1); как сделать без повторов?
-
 //Проверка длины строки
 
 function validateLength(string, maxLength) {
