@@ -9,23 +9,27 @@ const likesCount = bigPicture.querySelector(".likes-count");
 const commentsCount = bigPicture.querySelector(".comments-count");
 const description = bigPicture.querySelector(".social__caption");
 const commentsList = bigPicture.querySelector(".social__comments");
+const commentsLoader = bigPicture.querySelector(".comments-loader");
 
 const showBigPicture = () => {
   bigPicture.classList.remove("hidden");
   document.body.classList.add("modal-open");
+  commentsLoader.classList.remove("hidden");
 };
 
-closeButton.addEventListener("click", () => {
-  bigPicture.classList.add("hidden");
-  document.body.classList.remove("modal-open");
-});
-
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape") {
+const closeBigPicture = () => {
+  closeButton.addEventListener("click", () => {
     bigPicture.classList.add("hidden");
     document.body.classList.remove("modal-open");
-  }
-});
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !bigPicture.classList.contains("hidden")) {
+      bigPicture.classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+  });
+};
 
 const deliteTemplateComments = () => {
   commentsList.innerHTML = "";
@@ -34,16 +38,12 @@ const deliteTemplateComments = () => {
 const showData = (item) => {
   bigPictureImg.src = item.querySelector(".picture__img").src;
   likesCount.textContent = item.querySelector(".picture__likes").textContent;
-  commentsCount.textContent =
-    item.querySelector(".picture__comments").textContent;
   description.textContent = item.querySelector(".picture__img").alt;
 
   deliteTemplateComments();
 };
 
-const showComments = (idPhoto) => {
-  console.log("idPhoto:", idPhoto);
-  console.log("dataArray:", dataArray);
+const addComments = (idPhoto) => {
   const photoItem = dataArray.find((item) => item.id == idPhoto);
   if (photoItem) {
     photoItem.comments.forEach((comment) => {
@@ -52,8 +52,28 @@ const showComments = (idPhoto) => {
       commentElement.innerHTML = `<img class="social__picture" src="${comment.avatar}" alt="Аватар комментатора фотографии" width="35" height="35">
         <p class="social__text">${comment.message}</p>`;
       commentsList.appendChild(commentElement);
+      if (commentsList.children.length > 5) {
+        commentElement.classList.add("hidden");
+      }
     });
   }
 };
 
-export { showBigPicture, showData, showComments };
+const showComments = () => {
+  const commentsCount = bigPicture.querySelector(".social__comment-count");
+  if (!commentsLoader.classList.contains("hidden")) {
+    commentsCount.textContent = `5 из ${commentsList.children.length} комментариев`;
+  }
+  commentsLoader.addEventListener("click", () => {
+    commentsLoader.classList.add("hidden");
+    commentsCount.textContent = `${commentsList.children.length} из ${commentsList.children.length} комментариев`;
+    const comments = commentsList.querySelectorAll(".social__comment");
+    comments.forEach((item) => {
+      if (item.classList.contains("hidden")) {
+        item.classList.remove("hidden");
+      }
+    });
+  });
+};
+
+export { showBigPicture, closeBigPicture, showData, addComments, showComments };
