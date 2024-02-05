@@ -1,7 +1,6 @@
 import { dataArray } from "./data.js";
 import {
   showBigPicture,
-  closeBigPicture,
   showComments,
   showData,
   addComments,
@@ -30,9 +29,10 @@ const pictures = pictureList.querySelectorAll(".picture");
 for (let item of pictures) {
   item.addEventListener("click", () => {
     showBigPicture();
-    closeBigPicture();
     showData(item);
     addComments(item.id);
     showComments();
   });
 }
+
+console.log(dataArray);

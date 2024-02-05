@@ -1,12 +1,12 @@
 const uploadForm = document.querySelector("#upload-select-image");
-const uploadInput = document.querySelector(".img-upload__overlay");
-const uploadCancel = document.querySelector("#upload-cancel");
-const uploadImg = document.querySelector("#upload-file");
-const scaleImg = document.querySelector(".scale__control--value");
-const effectImg = document.querySelector(".effect-level__value");
-const noEffect = document.querySelector("#effect-none");
-const hashtagInput = document.querySelector(".text__hashtags");
-const descriptionInput = document.querySelector(".text__description");
+const uploadInput = uploadForm.querySelector(".img-upload__overlay");
+const uploadCancel = uploadForm.querySelector("#upload-cancel");
+const uploadImg = uploadForm.querySelector("#upload-file");
+const scaleImg = uploadForm.querySelector(".scale__control--value");
+const effectImg = uploadForm.querySelector(".effect-level__value");
+const noEffect = uploadForm.querySelector("#effect-none");
+const hashtagInput = uploadForm.querySelector(".text__hashtags");
+const descriptionInput = uploadForm.querySelector(".text__description");
 
 // Сброс настроект по дефолту
 
@@ -85,8 +85,184 @@ pristine.addValidator(
 );
 
 const onFormSubmit = (evt) => {
-  evt.preventDefault();
-  pristine.validate();
+  if (!pristine.validate()) {
+    evt.preventDefault();
+  }
 };
 
 uploadForm.addEventListener("submit", onFormSubmit);
+
+// Масштабирование изображения
+const imgUploadPreviw = uploadForm.querySelector(".img-upload__preview img");
+const scaleControl = uploadForm.querySelector(".img-upload__scale");
+const scaleButtonMinus = uploadForm.querySelector(".scale__control--smaller");
+const scaleButtonPlus = uploadForm.querySelector(".scale__control--bigger");
+
+const onScaleChange = () => {
+  switch (scaleImg.value) {
+    case "25%":
+      imgUploadPreviw.style.transform = `scale(${scaleImg.value})`;
+      break;
+    case "50%":
+      imgUploadPreviw.style.transform = `scale(${scaleImg.value})`;
+      break;
+    case "75%":
+      imgUploadPreviw.style.transform = `scale(${scaleImg.value})`;
+      break;
+    default:
+      imgUploadPreviw.style.transform = `scale(${scaleImg.value})`;
+      break;
+  }
+};
+
+scaleControl.addEventListener("click", (evt) => {
+  if (evt.target === scaleButtonMinus && scaleImg.value !== "25%") {
+    scaleImg.value = `${Number(scaleImg.value.slice(0, -1)) - 25}%`;
+    onScaleChange();
+  } else if (evt.target === scaleButtonPlus && scaleImg.value !== "100%") {
+    scaleImg.value = `${Number(scaleImg.value.slice(0, -1)) + 25}%`;
+    onScaleChange();
+  }
+});
+
+// Эффекты и слайдер
+const effectBar = uploadForm.querySelector(".img-upload__effect-level");
+const effectSlider = uploadForm.querySelector(".effect-level__slider");
+const effectLvl = uploadForm.querySelector(".effect-level__value");
+const effectList = uploadForm.querySelector(".effects__list");
+const effectInput = effectList.querySelectorAll(".effects__radio");
+let filterName;
+let unit;
+
+effectSlider.classList.add("hidden");
+
+noUiSlider.create(effectSlider, {
+  range: {
+    min: 0,
+    max: 100,
+  },
+  start: 100,
+  step: 1,
+  connect: "lower",
+});
+
+effectSlider.noUiSlider.on("update", () => {
+  effectLvl.value = effectSlider.noUiSlider.get();
+  imgUploadPreviw.style.filter = `${filterName}(${effectLvl.value}${unit})`;
+});
+
+const getEffectLvlValue = (name, symbol) => {
+  filterName = name;
+  unit = symbol;
+};
+
+const onEffectChange = (item) => {
+  if (item.value === "none") {
+    effectBar.classList.add("hidden");
+  } else {
+    effectBar.classList.remove("hidden");
+  }
+
+  switch (item.value) {
+    case "chrome":
+      effectSlider.classList.remove("hidden");
+      imgUploadPreviw.className = `effects__preview--${item.value}`;
+      getEffectLvlValue("grayscale", "");
+      effectSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 1,
+        },
+        start: 1,
+        step: 0.1,
+        connect: "lower",
+      });
+
+      break;
+
+    case "sepia":
+      effectSlider.classList.remove("hidden");
+      imgUploadPreviw.className = `effects__preview--${item.value}`;
+      getEffectLvlValue("sepia", "");
+      effectSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 1,
+        },
+        start: 1,
+        step: 0.1,
+        connect: "lower",
+      });
+
+      break;
+
+    case "marvin":
+      effectSlider.classList.remove("hidden");
+      imgUploadPreviw.className = `effects__preview--${item.value}`;
+      getEffectLvlValue("invert", "%");
+      effectSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 100,
+        },
+        start: 100,
+        step: 1,
+        connect: "lower",
+      });
+
+      break;
+
+    case "phobos":
+      effectSlider.classList.remove("hidden");
+      imgUploadPreviw.className = `effects__preview--${item.value}`;
+      getEffectLvlValue("blur", "px");
+      effectSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 3,
+        },
+        start: 3,
+        step: 0.1,
+        connect: "lower",
+      });
+
+      break;
+
+    case "heat":
+      effectSlider.classList.remove("hidden");
+      imgUploadPreviw.className = `effects__preview--${item.value}`;
+      getEffectLvlValue("brightness", "");
+      effectSlider.noUiSlider.updateOptions({
+        range: {
+          min: 1,
+          max: 3,
+        },
+        start: 3,
+        step: 0.1,
+        connect: "lower",
+      });
+
+      break;
+
+    default:
+      imgUploadPreviw.className = "";
+      effectSlider.classList.add("hidden");
+      effectSlider.noUiSlider.updateOptions({
+        range: {
+          min: 0,
+          max: 100,
+        },
+        start: 100,
+        step: 1,
+        connect: "lower",
+      });
+      imgUploadPreviw.style.filter = "";
+      break;
+  }
+};
+
+effectInput.forEach((radio) => {
+  radio.addEventListener("change", () => {
+    onEffectChange(radio);
+  });
+});

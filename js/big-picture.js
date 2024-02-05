@@ -6,7 +6,6 @@ const closeButton = bigPicture.querySelector(".big-picture__cancel");
 //Для функции showData
 const bigPictureImg = bigPicture.querySelector(".big-picture__img img");
 const likesCount = bigPicture.querySelector(".likes-count");
-const commentsCount = bigPicture.querySelector(".comments-count");
 const description = bigPicture.querySelector(".social__caption");
 const commentsList = bigPicture.querySelector(".social__comments");
 const commentsLoader = bigPicture.querySelector(".comments-loader");
@@ -17,21 +16,19 @@ const showBigPicture = () => {
   commentsLoader.classList.remove("hidden");
 };
 
-const closeBigPicture = () => {
-  closeButton.addEventListener("click", () => {
+closeButton.addEventListener("click", () => {
+  bigPicture.classList.add("hidden");
+  document.body.classList.remove("modal-open");
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape" && !bigPicture.classList.contains("hidden")) {
     bigPicture.classList.add("hidden");
     document.body.classList.remove("modal-open");
-  });
+  }
+});
 
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && !bigPicture.classList.contains("hidden")) {
-      bigPicture.classList.add("hidden");
-      document.body.classList.remove("modal-open");
-    }
-  });
-};
-
-const deliteTemplateComments = () => {
+const deleteTemplateComments = () => {
   commentsList.innerHTML = "";
 };
 
@@ -40,7 +37,7 @@ const showData = (item) => {
   likesCount.textContent = item.querySelector(".picture__likes").textContent;
   description.textContent = item.querySelector(".picture__img").alt;
 
-  deliteTemplateComments();
+  deleteTemplateComments();
 };
 
 const addComments = (idPhoto) => {
@@ -59,21 +56,23 @@ const addComments = (idPhoto) => {
   }
 };
 
+const commentsCount = bigPicture.querySelector(".social__comment-count");
+
 const showComments = () => {
-  const commentsCount = bigPicture.querySelector(".social__comment-count");
   if (!commentsLoader.classList.contains("hidden")) {
     commentsCount.textContent = `5 из ${commentsList.children.length} комментариев`;
   }
-  commentsLoader.addEventListener("click", () => {
-    commentsLoader.classList.add("hidden");
-    commentsCount.textContent = `${commentsList.children.length} из ${commentsList.children.length} комментариев`;
-    const comments = commentsList.querySelectorAll(".social__comment");
-    comments.forEach((item) => {
-      if (item.classList.contains("hidden")) {
-        item.classList.remove("hidden");
-      }
-    });
-  });
 };
 
-export { showBigPicture, closeBigPicture, showData, addComments, showComments };
+commentsLoader.addEventListener("click", () => {
+  commentsLoader.classList.add("hidden");
+  commentsCount.textContent = `${commentsList.children.length} из ${commentsList.children.length} комментариев`;
+  const comments = commentsList.querySelectorAll(".social__comment");
+  comments.forEach((item) => {
+    if (item.classList.contains("hidden")) {
+      item.classList.remove("hidden");
+    }
+  });
+});
+
+export { showBigPicture, showData, addComments, showComments };

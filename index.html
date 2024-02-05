@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="nouislider/nouislider.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <title>Кекстаграм</title>
@@ -91,9 +92,11 @@
                       <input
                         type="text"
                         class="scale__control scale__control--value"
-                        value="55%"
+                        value="100%"
                         title="Image Scale"
                         name="scale"
+                        min="25%"
+                        max="100%"
                         readonly
                       />
                       <button
@@ -113,7 +116,9 @@
                     </div>
 
                     <!-- Изменение глубины эффекта, накладываемого на изображение -->
-                    <fieldset class="img-upload__effect-level effect-level">
+                    <fieldset
+                      class="img-upload__effect-level effect-level hidden"
+                    >
                       <input
                         class="effect-level__value"
                         type="number"
@@ -470,6 +475,7 @@
         Загружаем...
       </div>
     </template>
+    <script src="nouislider/nouislider.js" type="text/javascript"></script>
     <script src="pristine/pristine.min.js" type="text/javascript"></script>
     <script src="js/main.js" type="module"></script>
   </body>
