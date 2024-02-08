@@ -69,14 +69,3 @@ function createPhotos() {
   }
   return photos;
 }
-
-const dataArray = createPhotos();
-
-export {
-  getRandomNumber,
-  generateArrayId,
-  createPhotoDescription,
-  createComments,
-  createPhotos,
-  dataArray,
-};

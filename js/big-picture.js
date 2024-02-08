@@ -1,4 +1,3 @@
-import { dataArray } from "./data.js";
 //Для функции showBigPicture
 const bigPicture = document.querySelector(".big-picture");
 const closeButton = bigPicture.querySelector(".big-picture__cancel");
@@ -33,34 +32,43 @@ const deleteTemplateComments = () => {
 };
 
 const showData = (item) => {
-  bigPictureImg.src = item.querySelector(".picture__img").src;
-  likesCount.textContent = item.querySelector(".picture__likes").textContent;
-  description.textContent = item.querySelector(".picture__img").alt;
+  const picture = item.querySelector(".picture__img");
+  const likes = item.querySelector(".picture__likes");
+  bigPictureImg.src = picture.src;
+  likesCount.textContent = likes.textContent;
+  description.textContent = picture.alt;
 
   deleteTemplateComments();
 };
 
-const addComments = (idPhoto) => {
-  const photoItem = dataArray.find((item) => item.id == idPhoto);
-  if (photoItem) {
-    photoItem.comments.forEach((comment) => {
-      const commentElement = document.createElement("li");
-      commentElement.classList.add("social__comment");
-      commentElement.innerHTML = `<img class="social__picture" src="${comment.avatar}" alt="Аватар комментатора фотографии" width="35" height="35">
-        <p class="social__text">${comment.message}</p>`;
-      commentsList.appendChild(commentElement);
-      if (commentsList.children.length > 5) {
-        commentElement.classList.add("hidden");
+const addComments = (item, array) => {
+  for (let object of array) {
+    if (item.src.includes(object.url)) {
+      for (let comment of object.comments) {
+        const commentElement = document.createElement("li");
+        commentElement.classList.add("social__comment");
+        commentElement.innerHTML = `<img class="social__picture" src="${comment.avatar}" alt="Аватар комментатора фотографии" width="35" height="35">
+            <p class="social__text">${comment.message}</p>`;
+        commentsList.appendChild(commentElement);
+        if (commentsList.children.length > 5) {
+          commentElement.classList.add("hidden");
+        }
       }
-    });
+    }
   }
 };
 
 const commentsCount = bigPicture.querySelector(".social__comment-count");
 
 const showComments = () => {
-  if (!commentsLoader.classList.contains("hidden")) {
+  if (
+    !commentsLoader.classList.contains("hidden") &&
+    commentsList.children.length > 5
+  ) {
     commentsCount.textContent = `5 из ${commentsList.children.length} комментариев`;
+  } else {
+    commentsCount.textContent = `${commentsList.children.length} из ${commentsList.children.length} комментариев`;
+    commentsLoader.classList.add("hidden");
   }
 };
 
@@ -75,4 +83,18 @@ commentsLoader.addEventListener("click", () => {
   });
 });
 
-export { showBigPicture, showData, addComments, showComments };
+const createBigPicture = (array) => {
+  const pictureList = document.querySelector(".pictures");
+
+  pictureList.addEventListener("click", (event) => {
+    const picture = event.target.closest(".picture");
+
+    if (event.target.classList.contains("picture__img")) {
+      showBigPicture();
+      showData(picture);
+      addComments(event.target, array);
+      showComments();
+    }
+  });
+};
+export { createBigPicture };

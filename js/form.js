@@ -3,29 +3,24 @@ const uploadInput = uploadForm.querySelector(".img-upload__overlay");
 const uploadCancel = uploadForm.querySelector("#upload-cancel");
 const uploadImg = uploadForm.querySelector("#upload-file");
 const scaleImg = uploadForm.querySelector(".scale__control--value");
-const effectImg = uploadForm.querySelector(".effect-level__value");
-const noEffect = uploadForm.querySelector("#effect-none");
 const hashtagInput = uploadForm.querySelector(".text__hashtags");
 const descriptionInput = uploadForm.querySelector(".text__description");
+const effectSlider = uploadForm.querySelector(".effect-level__slider");
+const effectBar = uploadForm.querySelector(".img-upload__effect-level");
 
-// Сброс настроект по дефолту
+//Закрытие окна редактирования
 
-uploadImg.addEventListener("change", () => {
-  uploadInput.classList.remove("hidden");
-  document.body.classList.add("modal-open");
-  scaleImg.value = "100%";
-  effectImg.value = "";
-  noEffect.checked = true;
-  hashtagInput.value = "";
-  descriptionInput.value = "";
-});
-
-// Открытие и закрытие окна редактирования
-
-uploadCancel.addEventListener("click", () => {
+const uploadClose = () => {
   uploadInput.classList.add("hidden");
   document.body.classList.remove("modal-open");
-  uploadImg.value = "";
+  uploadForm.reset();
+  imgUploadPreviw.style.filter = "";
+  imgUploadPreviw.className = "";
+  onScaleChange();
+};
+
+uploadCancel.addEventListener("click", () => {
+  uploadClose();
 });
 
 const isTextFieldFocused = () =>
@@ -33,10 +28,12 @@ const isTextFieldFocused = () =>
   document.activeElement === descriptionInput;
 
 document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape" && !isTextFieldFocused()) {
-    uploadInput.classList.add("hidden");
-    document.body.classList.remove("modal-open");
-    uploadImg.value = "";
+  if (
+    event.key === "Escape" &&
+    !isTextFieldFocused() &&
+    !uploadInput.classList.contains("hidden")
+  ) {
+    uploadClose();
   }
 });
 
@@ -84,13 +81,60 @@ pristine.addValidator(
   "Неправильно заполнены хэштеги"
 );
 
-const onFormSubmit = (evt) => {
-  if (!pristine.validate()) {
-    evt.preventDefault();
-  }
+//Оповещения пользователя
+
+const showModalSuccess = () => {
+  const successTemplate = document.querySelector("#success").content;
+  const successElement = successTemplate.querySelector(".success");
+  const successClone = successElement.cloneNode(true);
+  document.body.append(successClone);
+  document.body.classList.add("modal-open");
+
+  successClone.addEventListener("click", () => {
+    closeModal(successClone);
+  });
+
+  successClone.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeModal(successClone);
+    }
+  });
 };
 
-uploadForm.addEventListener("submit", onFormSubmit);
+const showModalFail = () => {
+  const failTemplate = document.querySelector("#error").content;
+  const failElement = failTemplate.querySelector(".error");
+  const failClone = failElement.cloneNode(true);
+  document.body.append(failClone);
+  document.body.classList.add("modal-open");
+
+  failClone.addEventListener("click", () => {
+    closeModal(failClone);
+  });
+
+  failClone.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeModal(failClone);
+    }
+  });
+};
+
+const showModalProgress = () => {
+  const progressTemplate = document.querySelector("#messages").content;
+  const progressElement = progressTemplate.querySelector(
+    ".img-upload__message--loading"
+  );
+  const progressClone = progressElement.cloneNode(true);
+  uploadForm.append(progressClone);
+  setTimeout(() => {
+    closeModal(progressClone);
+  }, 1000);
+};
+
+const closeModal = (element) => {
+  element.remove();
+  document.body.classList.remove("modal-open");
+};
 
 // Масштабирование изображения
 const imgUploadPreviw = uploadForm.querySelector(".img-upload__preview img");
@@ -110,7 +154,7 @@ const onScaleChange = () => {
       imgUploadPreviw.style.transform = `scale(${scaleImg.value})`;
       break;
     default:
-      imgUploadPreviw.style.transform = `scale(${scaleImg.value})`;
+      imgUploadPreviw.style = "";
       break;
   }
 };
@@ -126,15 +170,12 @@ scaleControl.addEventListener("click", (evt) => {
 });
 
 // Эффекты и слайдер
-const effectBar = uploadForm.querySelector(".img-upload__effect-level");
-const effectSlider = uploadForm.querySelector(".effect-level__slider");
 const effectLvl = uploadForm.querySelector(".effect-level__value");
 const effectList = uploadForm.querySelector(".effects__list");
 const effectInput = effectList.querySelectorAll(".effects__radio");
+
 let filterName;
 let unit;
-
-effectSlider.classList.add("hidden");
 
 noUiSlider.create(effectSlider, {
   range: {
@@ -165,7 +206,7 @@ const onEffectChange = (item) => {
 
   switch (item.value) {
     case "chrome":
-      effectSlider.classList.remove("hidden");
+      effectBar.classList.remove("hidden");
       imgUploadPreviw.className = `effects__preview--${item.value}`;
       getEffectLvlValue("grayscale", "");
       effectSlider.noUiSlider.updateOptions({
@@ -181,7 +222,7 @@ const onEffectChange = (item) => {
       break;
 
     case "sepia":
-      effectSlider.classList.remove("hidden");
+      effectBar.classList.remove("hidden");
       imgUploadPreviw.className = `effects__preview--${item.value}`;
       getEffectLvlValue("sepia", "");
       effectSlider.noUiSlider.updateOptions({
@@ -197,7 +238,7 @@ const onEffectChange = (item) => {
       break;
 
     case "marvin":
-      effectSlider.classList.remove("hidden");
+      effectBar.classList.remove("hidden");
       imgUploadPreviw.className = `effects__preview--${item.value}`;
       getEffectLvlValue("invert", "%");
       effectSlider.noUiSlider.updateOptions({
@@ -213,7 +254,7 @@ const onEffectChange = (item) => {
       break;
 
     case "phobos":
-      effectSlider.classList.remove("hidden");
+      effectBar.classList.remove("hidden");
       imgUploadPreviw.className = `effects__preview--${item.value}`;
       getEffectLvlValue("blur", "px");
       effectSlider.noUiSlider.updateOptions({
@@ -229,7 +270,7 @@ const onEffectChange = (item) => {
       break;
 
     case "heat":
-      effectSlider.classList.remove("hidden");
+      effectBar.classList.remove("hidden");
       imgUploadPreviw.className = `effects__preview--${item.value}`;
       getEffectLvlValue("brightness", "");
       effectSlider.noUiSlider.updateOptions({
@@ -246,7 +287,7 @@ const onEffectChange = (item) => {
 
     default:
       imgUploadPreviw.className = "";
-      effectSlider.classList.add("hidden");
+      effectBar.classList.add("hidden");
       effectSlider.noUiSlider.updateOptions({
         range: {
           min: 0,
@@ -266,3 +307,27 @@ effectInput.forEach((radio) => {
     onEffectChange(radio);
   });
 });
+
+// Сброс при открытии формы
+
+uploadImg.addEventListener("change", (event) => {
+  uploadInput.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+  onEffectChange(event);
+});
+
+// Отправка формы
+
+const onFormSubmit = (connect, onSuccess, onFail) => {
+  uploadForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    if (pristine.validate()) {
+      const formData = new FormData(evt.target);
+      connect(onSuccess, onFail, formData);
+      uploadClose();
+      showModalProgress();
+    }
+  });
+};
+
+export { showModalSuccess, showModalFail, showModalProgress, onFormSubmit };
