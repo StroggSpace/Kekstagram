@@ -14,9 +14,6 @@ const deleteThubnails = () => {
 };
 
 const showThumbnails = (data) => {
-  deleteThubnails();
-  showFilters();
-
   const picturesData = data;
 
   for (let item of picturesData) {
@@ -29,8 +26,6 @@ const showThumbnails = (data) => {
 
     pictureList.append(picture);
   }
-
-  selectFilters(picturesData);
 };
 
 const showFilters = () => {
@@ -39,6 +34,9 @@ const showFilters = () => {
 };
 
 const selectFilters = (array) => {
+  showFilters();
+  showThumbnails(array);
+
   const filters = document.querySelector(".img-filters");
   const filterButtons = filters.querySelectorAll(".img-filters__button");
   filterButtons.forEach((button) => {
@@ -48,22 +46,26 @@ const selectFilters = (array) => {
           .querySelector(".img-filters__button--active")
           .classList.remove("img-filters__button--active");
         evt.target.classList.add("img-filters__button--active");
-      }
-
-      const newArray = array.slice();
-
-      switch (evt.target.id) {
-        case "filter-discussed":
-          return newArray.sort((a, b) => b.comments.length - a.comments.length);
-
-        case "filter-random":
-          return shuffleAndSelect(newArray, 10);
-
-        default:
-          return array;
+        let newFitler = sortingImg(array, evt.target.id);
+        deleteThubnails();
+        showThumbnails(newFitler);
       }
     });
   });
 };
 
-export { showThumbnails };
+const sortingImg = (array, id) => {
+  const newArray = array.slice();
+
+  switch (id) {
+    case "filter-discussed":
+      return newArray.sort((a, b) => b.comments.length - a.comments.length);
+
+    case "filter-random":
+      return shuffleAndSelect(newArray, 10);
+
+    default:
+      return array;
+  }
+};
+export { showThumbnails, selectFilters };

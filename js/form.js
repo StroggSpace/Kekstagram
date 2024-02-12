@@ -173,6 +173,7 @@ scaleControl.addEventListener("click", (evt) => {
 const effectLvl = uploadForm.querySelector(".effect-level__value");
 const effectList = uploadForm.querySelector(".effects__list");
 const effectInput = effectList.querySelectorAll(".effects__radio");
+const effectItems = effectList.querySelectorAll(".effects__preview");
 
 let filterName;
 let unit;
@@ -311,6 +312,14 @@ effectInput.forEach((radio) => {
 // Сброс при открытии формы
 
 uploadImg.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  const url = URL.createObjectURL(file);
+  imgUploadPreviw.src = url;
+
+  for (let item of effectItems) {
+    item.style.backgroundImage = `url(${url})`;
+  }
+
   uploadInput.classList.remove("hidden");
   document.body.classList.add("modal-open");
   onEffectChange(event);
